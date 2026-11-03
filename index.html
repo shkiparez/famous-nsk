@@ -1,0 +1,766 @@
+<title>Famous салон красоты</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Famous — салон красоты в Новосибирске. Три филиала: Семьи Шамшиных, 26 · Фрунзе, 228 · Карла Маркса, 51.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&family=PT+Mono&display=swap">
+<style>
+/* Layout: шалфейная «прайс-карта» салона — тонкие разреженные капители, тени листьев, моно-цены как на их прайсе; страницы переключаются по hash */
+:root{
+  --bg:#f3f4ef; --paper:#fbfbf8; --ink:#1f2622; --muted:#65706a; --line:#d6dbd2;
+  --sage:#7d9283; --sage-deep:#4f6556; --sage-soft:#e3e9e2; --on-sage:#f6f8f4;
+  --shadow:rgba(31,38,34,.10);
+  --forest:#2c3d33; --on-forest:#eef2ec; --blush:#ecd6cd; --blush-ink:#9a6556; --river:#b7c9cf; --map:#e6ebe3; --street:#cfd6cc;
+  --f-display:"Cormorant","Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --f-body:"Manrope","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"PT Mono","Courier New",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141a17; --paper:#1a221e; --ink:#e9ece6; --muted:#9ba69f; --line:#2e3a33;
+  --sage:#9db3a3; --sage-deep:#c3d3c7; --sage-soft:#24302a; --on-sage:#141a17; --shadow:rgba(0,0,0,.4);
+  --forest:#0e1411; --on-forest:#e3ebe4; --blush:#3a2c28; --blush-ink:#e2b5a7; --river:#33474d; --map:#1f2924; --street:#2b3731; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141a17; --paper:#1a221e; --ink:#e9ece6; --muted:#9ba69f; --line:#2e3a33;
+  --sage:#9db3a3; --sage-deep:#c3d3c7; --sage-soft:#24302a; --on-sage:#141a17; --shadow:rgba(0,0,0,.4);
+  --forest:#0e1411; --on-forest:#e3ebe4; --blush:#3a2c28; --blush-ink:#e2b5a7; --river:#33474d; --map:#1f2924; --street:#2b3731; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+a{color:inherit}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--sage);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.logo{font-family:var(--f-display);font-weight:300;letter-spacing:.42em;text-transform:uppercase;line-height:1}
+.logo small{display:block;font-family:var(--f-body);font-size:.62rem;letter-spacing:.32em;text-transform:lowercase;color:var(--muted);margin-top:6px}
+.eyebrow{font-size:.72rem;letter-spacing:.24em;text-transform:uppercase;color:var(--sage-deep);font-weight:600}
+h1,h2,h3{font-family:var(--f-display);font-weight:300;line-height:1.05;margin:0;text-wrap:balance}
+h2{font-size:clamp(2.2rem,5vw,3.6rem)}
+h2 em,h1 em{font-style:italic;color:var(--sage-deep)}
+.lead{color:var(--muted);max-width:56ch;margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* ---------- header ---------- */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;gap:20px;padding-block:14px}
+.hbar .logo{font-size:1.45rem;text-decoration:none}
+nav.main{display:flex;gap:26px;margin-left:auto}
+nav.main a{text-decoration:none;font-size:.86rem;letter-spacing:.06em;color:var(--muted);padding-block:6px;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+nav.main a:hover,nav.main a[aria-current="page"]{color:var(--ink);border-color:var(--sage)}
+.branch-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;font-size:.8rem;white-space:nowrap}
+.branch-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--sage)}
+.burger{display:none;margin-left:auto;background:none;border:1px solid var(--line);border-radius:999px;width:42px;height:42px}
+.burger span{display:block;width:16px;height:1px;background:var(--ink);margin:4px auto}
+@media (max-width:900px){
+  nav.main{position:fixed;inset:0;top:0;flex-direction:column;justify-content:center;align-items:center;gap:22px;background:var(--bg);z-index:70;opacity:0;pointer-events:none;transition:opacity .3s;margin:0;padding:max(20px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 20px max(20px,env(safe-area-inset-left,0px))}
+  nav.main.open{opacity:1;pointer-events:auto}
+  nav.main a{font-family:var(--f-display);font-size:2rem;color:var(--ink)}
+  .burger{display:block}
+  .hbar .branch-pill{margin-left:auto}
+  .hbar .burger{margin-left:0}
+  .branch-pill .txt{max-width:120px;overflow:hidden;text-overflow:ellipsis}
+}
+.nav-close{display:none}
+@media (max-width:900px){.nav-close{display:block;position:absolute;top:calc(18px + env(safe-area-inset-top,0px));right:max(20px,env(safe-area-inset-right,0px));background:none;border:1px solid var(--line);border-radius:999px;width:42px;height:42px;font-size:1.2rem}}
+
+/* ---------- views ---------- */
+.view{display:none}
+.view.active{display:block;animation:viewIn .7s cubic-bezier(.2,.7,.2,1)}
+@keyframes viewIn{from{opacity:.0;transform:translateY(14px)}to{opacity:1;transform:none}}
+section{padding-block:clamp(56px,9vw,110px)}
+.sec-head{display:grid;gap:14px;margin-bottom:clamp(30px,5vw,54px)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding-block:clamp(36px,6vw,70px) clamp(50px,8vw,90px);overflow:hidden}
+.leaves{position:absolute;inset:0;pointer-events:none;opacity:.5}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,5vw,70px);align-items:center;position:relative}
+.hero h1{font-size:clamp(3rem,8.5vw,6.6rem);letter-spacing:-.01em}
+.hero h1 .logo{display:block;font-size:.62em;letter-spacing:.4em;margin-bottom:.35em;color:var(--sage-deep)}
+.hero .lead{margin-top:22px;font-size:1.06rem}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:28px;font-size:.88rem;color:var(--muted)}
+.hero-meta b{color:var(--ink);font-weight:600}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:15px 26px;font-size:.9rem;letter-spacing:.04em;text-decoration:none;border:1px solid var(--ink);background:var(--ink);color:var(--bg);transition:transform .25s,background .25s,color .25s}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--bg)}
+.btn.sage{background:var(--sage-deep);border-color:var(--sage-deep);color:var(--on-sage)}
+.hero-photos{position:relative;aspect-ratio:4/5;max-width:100%}
+.hero-photos figure{position:absolute;margin:0;overflow:hidden;border-radius:200px 200px 6px 6px;box-shadow:0 30px 60px -30px var(--shadow)}
+.hero-photos figure img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);animation:slowZoom 14s ease-out forwards}
+.hero-photos .p1{inset:0 26% 8% 0}
+.hero-photos .p2{inset:38% 0 0 52%;border-radius:6px;border:6px solid var(--bg)}
+@keyframes slowZoom{to{transform:scale(1)}}
+.stamp{position:absolute;left:-6px;bottom:2%;background:var(--paper);border:1px solid var(--line);padding:14px 18px;border-radius:6px;font-size:.8rem;line-height:1.35;box-shadow:0 18px 40px -24px var(--shadow)}
+.stamp .mono{font-size:1.6rem;display:block;color:var(--sage-deep)}
+@media (max-width:820px){.hero-grid{grid-template-columns:1fr}.hero-photos{max-width:460px;width:100%;margin:0 auto}}
+
+/* ---------- marquee ---------- */
+.marquee{border-block:1px solid var(--line);overflow:hidden;padding-block:16px;background:var(--paper)}
+.marquee-track{display:flex;gap:46px;width:max-content;animation:marq 38s linear infinite;font-family:var(--f-display);font-style:italic;font-size:1.5rem;color:var(--sage-deep)}
+.marquee-track span::after{content:"✦";font-style:normal;font-size:.7rem;margin-left:46px;color:var(--sage);vertical-align:middle}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* ---------- direction cards ---------- */
+.dirs{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.dir{position:relative;text-decoration:none;display:block;border-radius:6px;overflow:hidden;background:var(--paper);border:1px solid var(--line)}
+.dir .ph{aspect-ratio:3/4;overflow:hidden}
+.dir img{width:100%;height:100%;object-fit:cover;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.dir:hover img{transform:scale(1.06)}
+.dir .cap{padding:16px 18px 20px;display:grid;gap:4px}
+.dir h3{font-size:1.6rem}
+.dir .from{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
+@media (max-width:900px){.dirs{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:440px){.dirs{gap:10px}.dir h3{font-size:1.25rem}.dir .cap{padding:12px}}
+
+/* ---------- about strip ---------- */
+.about{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.about div{background:var(--paper);padding:28px 26px;display:grid;gap:8px;align-content:start}
+.about .k{font-family:var(--f-display);font-size:2.6rem;line-height:1;color:var(--sage-deep)}
+.about p{margin:0;color:var(--muted);font-size:.92rem}
+@media (max-width:760px){.about{grid-template-columns:1fr}}
+
+/* ---------- before/after ---------- */
+.ba-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.ba{margin:0;border-radius:6px;overflow:hidden;background:var(--paper);border:1px solid var(--line);position:relative}
+.ba img{width:100%;aspect-ratio:900/870;object-fit:cover}
+.ba figcaption{position:absolute;left:12px;top:12px;display:flex;gap:6px}
+.ba figcaption span{background:color-mix(in srgb,var(--paper) 88%,transparent);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+@media (max-width:640px){.ba-grid{grid-template-columns:1fr}}
+
+/* ---------- services page ---------- */
+.svc{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(24px,5vw,64px);align-items:center;padding-block:clamp(36px,6vw,64px);border-top:1px solid var(--line)}
+.svc:nth-of-type(even) .svc-ph{order:2}
+.svc-ph{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.svc-ph img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px}
+.svc-ph img:first-child{border-radius:160px 160px 6px 6px}
+.svc-ph img:last-child{margin-top:36px}
+.svc-body{display:grid;gap:16px;min-width:0}
+.svc-body h3{font-size:clamp(2rem,4vw,3rem)}
+.svc-body p{margin:0;color:var(--muted);max-width:58ch}
+.svc-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.svc-price .mono{font-size:1.5rem}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tags span{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.8rem;color:var(--muted)}
+@media (max-width:820px){.svc{grid-template-columns:1fr}.svc:nth-of-type(even) .svc-ph{order:0}}
+
+/* ---------- price page (как их прайс-карточка) ---------- */
+.price-wrap{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.pcard{position:relative;background:var(--sage);color:var(--on-sage);border-radius:6px;padding:clamp(26px,4vw,44px);overflow:hidden}
+.pcard .leafshade{position:absolute;inset:0;opacity:.28;pointer-events:none}
+.pcard h3{font-family:var(--f-mono);font-size:1.5rem;letter-spacing:.14em;text-transform:uppercase;text-align:center;margin-bottom:26px;position:relative}
+.pcard ul{list-style:none;margin:0;padding:0;display:grid;gap:16px;position:relative}
+.pcard li{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:baseline;font-family:var(--f-mono);font-size:.95rem;line-height:1.35}
+.pcard li .v{white-space:nowrap;font-variant-numeric:tabular-nums}
+.pcard .sig{position:relative;text-align:center;margin-top:30px;font-size:1.3rem;opacity:.85}
+.pcard .sig small{color:inherit;opacity:.8}
+@media (max-width:760px){.price-wrap{grid-template-columns:1fr}}
+.note{margin-top:22px;font-size:.88rem;color:var(--muted);max-width:70ch}
+
+/* ---------- works page ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+.filters button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:9px 18px;font-size:.85rem;transition:background .2s,color .2s}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gallery{columns:4 220px;column-gap:12px}
+.gallery figure{margin:0 0 12px;break-inside:avoid;border-radius:6px;overflow:hidden;cursor:zoom-in;position:relative}
+.gallery img{width:100%;transition:transform .8s,filter .4s}
+.gallery figure:hover img{transform:scale(1.04)}
+.gallery figure[hidden]{display:none}
+.lightbox{position:fixed;inset:0;z-index:90;background:rgba(10,14,12,.92);display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
+.lightbox img{max-height:86vh;max-width:100%;border-radius:4px;object-fit:contain}
+.lightbox button{position:absolute;background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;width:46px;height:46px;font-size:1.2rem}
+.lb-close{top:calc(18px + env(safe-area-inset-top,0px));right:max(18px,env(safe-area-inset-right,0px))}
+.lb-prev{left:max(12px,env(safe-area-inset-left,0px));top:50%}
+.lb-next{right:max(12px,env(safe-area-inset-right,0px));top:50%}
+
+/* ---------- contacts ---------- */
+.branches{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.bcard{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:26px;display:grid;gap:12px;align-content:start;transition:border-color .3s,box-shadow .3s}
+.bcard.current{border-color:var(--sage);box-shadow:0 0 0 1px var(--sage)}
+.bcard .badge{justify-self:start;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;background:var(--sage-soft);color:var(--sage-deep);padding:4px 10px;border-radius:999px}
+.bcard h3{font-size:1.8rem}
+.bcard .addr{color:var(--muted);font-size:.9rem;margin:0}
+.bcard .rate{font-size:.85rem}
+.bcard .rate b{font-family:var(--f-mono);font-weight:400}
+.bcard .ph{font-family:var(--f-mono);font-size:1.05rem}
+.bcard .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.bcard .acts a,.bcard .acts button{font-size:.8rem;border:1px solid var(--line);background:none;border-radius:999px;padding:8px 14px;text-decoration:none}
+.bcard .acts button.pick{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (max-width:900px){.branches{grid-template-columns:1fr}}
+.unified{margin-top:20px;display:flex;flex-wrap:wrap;gap:16px 40px;align-items:center;justify-content:space-between;background:var(--sage-soft);border-radius:6px;padding:24px 28px}
+.unified .mono{font-size:1.4rem}
+
+/* ---------- messenger block ---------- */
+.msg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.msg a{display:flex;align-items:center;gap:14px;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px;transition:transform .25s,border-color .25s}
+.msg a:hover{transform:translateY(-3px);border-color:var(--sage)}
+.msg svg{width:28px;height:28px;flex:none;color:var(--sage-deep)}
+.msg b{display:block;font-weight:600}
+.msg small{color:var(--muted);font-family:var(--f-mono);font-size:.8rem}
+@media (max-width:700px){.msg{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding-block:44px calc(110px + env(safe-area-inset-bottom,0px));background:var(--paper)}
+.fgrid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:30px}
+.fgrid h4{margin:0 0 10px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fgrid p{margin:0;font-size:.9rem}
+@media (max-width:760px){.fgrid{grid-template-columns:1fr}}
+
+/* ---------- floating dock ---------- */
+.dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:55;display:flex;gap:6px;background:var(--ink);color:var(--bg);border-radius:999px;padding:6px;box-shadow:0 20px 40px -18px var(--shadow);max-width:calc(100% - 32px)}
+.dock button,.dock a{display:flex;align-items:center;gap:8px;background:none;border:0;color:inherit;text-decoration:none;font-size:.85rem;padding:11px 18px;border-radius:999px;white-space:nowrap}
+.dock .call{background:var(--sage);color:var(--on-sage)}
+.dock svg{width:17px;height:17px}
+
+/* ---------- modals ---------- */
+.overlay{position:fixed;inset:0;z-index:80;background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overflow-y:auto}
+.sheet{width:100%;max-width:980px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:clamp(24px,4vw,48px);box-shadow:0 40px 80px -40px var(--shadow);animation:sheetIn .6s cubic-bezier(.2,.7,.2,1);position:relative;margin:auto}
+.sheet.small{max-width:460px}
+@keyframes sheetIn{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
+.sheet .logo{font-size:1.9rem;text-align:center}
+.sheet .q{text-align:center;font-family:var(--f-display);font-style:italic;font-size:clamp(1.6rem,3.5vw,2.3rem);margin:22px 0 26px}
+.choose{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.choose button{text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;display:grid;transition:transform .3s,border-color .3s}
+.choose button:hover{transform:translateY(-4px);border-color:var(--sage)}
+.choose .cimg{aspect-ratio:16/10;overflow:hidden}
+.choose .ctxt{padding:16px 18px 20px;display:grid;gap:4px}
+.choose .ctxt b{font-family:var(--f-display);font-size:1.5rem;font-weight:400;line-height:1.1}
+.choose .ctxt span{font-size:.82rem;color:var(--muted)}
+.choose .ctxt i{font-style:normal;font-family:var(--f-mono);font-size:.8rem;color:var(--sage-deep)}
+@media (max-width:760px){.choose{grid-template-columns:1fr}.choose button{grid-template-columns:130px 1fr}.choose .cimg{aspect-ratio:auto;height:100%;min-height:120px}.choose .mlogo{width:40px;height:40px;font-size:6px;left:6px;top:6px}.choose .mlogo small{display:none}.choose .map .lbl{display:none}}
+.x{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--line);border-radius:999px;width:38px;height:38px}
+.callopt{display:grid;gap:10px;margin-top:18px}
+.callopt a{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:16px 18px;transition:border-color .2s,background .2s}
+.callopt a:hover{border-color:var(--sage);background:var(--sage-soft)}
+.callopt .mono{font-size:1.15rem}
+.callopt small{color:var(--muted);grid-column:1}
+.callopt .go{grid-row:1/3;grid-column:2;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--sage-deep)}
+.copy{margin-top:12px;font-size:.78rem;color:var(--muted);text-align:center}
+
+/* ---------- v2: цвет и движение ---------- */
+.progress{position:fixed;top:env(safe-area-inset-top,0px);left:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--sage),var(--blush-ink));z-index:65}
+.hero::before{content:"";position:absolute;width:620px;height:620px;right:-120px;top:-160px;border-radius:50%;background:radial-gradient(circle at 40% 40%,var(--blush),transparent 65%);opacity:.75;animation:drift 16s ease-in-out infinite alternate;pointer-events:none}
+.hero::after{content:"";position:absolute;width:520px;height:520px;left:-200px;bottom:-220px;border-radius:50%;background:radial-gradient(circle,var(--sage-soft),transparent 65%);animation:drift 20s ease-in-out infinite alternate-reverse;pointer-events:none}
+@keyframes drift{to{transform:translate(-60px,50px) scale(1.12)}}
+.leaves{transform-origin:100% 0;animation:sway 7s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-2deg) translateY(0)}to{transform:rotate(2.5deg) translateY(10px)}}
+.hero-grid>div:first-child>*{animation:rise 1s cubic-bezier(.2,.7,.2,1) both}
+.hero-grid>div:first-child>*:nth-child(2){animation-delay:.12s}
+.hero-grid>div:first-child>*:nth-child(3){animation-delay:.26s}
+.hero-grid>div:first-child>*:nth-child(4){animation-delay:.38s}
+.hero-grid>div:first-child>*:nth-child(5){animation-delay:.5s}
+.hero-photos{animation:rise 1.2s .2s cubic-bezier(.2,.7,.2,1) both}
+.hero-photos .p2{animation:floaty 6s ease-in-out infinite alternate}
+.stamp{animation:floaty 7s 1s ease-in-out infinite alternate-reverse}
+@keyframes floaty{to{transform:translateY(-12px)}}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.hero h1 em{background:linear-gradient(100deg,var(--sage-deep),var(--blush-ink),var(--sage-deep));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 8s linear infinite}
+@keyframes sheen{to{background-position:-200% 0}}
+.marquee{background:var(--forest);border-color:var(--forest)}
+.marquee-track{color:var(--on-forest)}
+.marquee-track span::after{color:var(--blush-ink)}
+.dir .ph{position:relative}
+.dir .ph::after{content:"Подробнее →";position:absolute;inset:auto 0 0 0;padding:40px 16px 14px;background:linear-gradient(transparent,color-mix(in srgb,var(--forest) 85%,transparent));color:var(--on-forest);font-size:.8rem;letter-spacing:.08em;opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+.dir:hover .ph::after{opacity:1;transform:none}
+.dir{transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s}
+.dir:hover{transform:translateY(-6px);box-shadow:0 26px 40px -26px var(--shadow)}
+.band{background:var(--forest);color:var(--on-forest);position:relative;overflow:hidden}
+.band .eyebrow{color:var(--blush-ink)}
+.band h2 em{color:var(--blush-ink)}
+.band .leaves{color:var(--on-forest);opacity:.05}
+.about{background:color-mix(in srgb,var(--on-forest) 15%,transparent);border-color:color-mix(in srgb,var(--on-forest) 15%,transparent)}
+.band .about div{background:var(--forest)}
+.band .about .k{color:var(--blush-ink)}
+.band .about p{color:color-mix(in srgb,var(--on-forest) 70%,transparent)}
+.show{display:grid;grid-template-columns:1.2fr 1fr 1fr;grid-template-rows:auto auto;gap:14px}
+.show figure{margin:0;position:relative;overflow:hidden;border-radius:6px}
+.show figure:first-child{grid-row:span 2;border-radius:220px 220px 6px 6px}
+.show img{width:100%;height:100%;object-fit:cover;aspect-ratio:3/4;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.show figure:first-child img{aspect-ratio:auto}
+.show figure:hover img{transform:scale(1.07)}
+.show figcaption{position:absolute;left:12px;bottom:12px;background:color-mix(in srgb,var(--forest) 80%,transparent);color:var(--on-forest);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px;backdrop-filter:blur(6px)}
+@media (max-width:700px){.show{grid-template-columns:1fr 1fr}.show figure:first-child{grid-column:span 2;grid-row:auto;border-radius:180px 180px 6px 6px}.show figure:first-child img{aspect-ratio:4/5}}
+.pcard .leafshade{animation:leafdrift 12s ease-in-out infinite alternate}
+@keyframes leafdrift{from{transform:translate(0,0) rotate(0)}to{transform:translate(18px,-12px) rotate(3deg)}}
+.pcard li{border-bottom:1px dashed color-mix(in srgb,var(--on-sage) 30%,transparent);padding-bottom:12px}
+.pcard:nth-child(2){background:var(--forest);color:var(--on-forest)}
+.msg a:nth-child(1):hover{border-color:#25d366}
+.msg a:nth-child(2):hover{border-color:#2aabee}
+.msg a:nth-child(3):hover{border-color:#7b5cff}
+.svc:nth-of-type(odd){background:linear-gradient(90deg,transparent,var(--sage-soft) 30%,var(--sage-soft) 70%,transparent)}
+/* карта филиала */
+.map{position:relative;background:var(--map);overflow:hidden}
+.map svg{width:100%;height:100%;display:block}
+.map .river{fill:none;stroke:var(--river);stroke-width:16;stroke-linecap:round}
+.map .river2{fill:none;stroke:var(--map);stroke-width:2;stroke-dasharray:3 9;opacity:.8}
+.map .st{stroke:var(--street);stroke-width:2.5;fill:none}
+.map .st.thin{stroke-width:1.2}
+.map .pin-o{fill:var(--muted);opacity:.35}
+.map .pin-a{fill:var(--forest)}
+.map .ring{fill:none;stroke:var(--blush-ink);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:ping 2s ease-out infinite}
+@keyframes ping{from{transform:scale(.4);opacity:1}to{transform:scale(2.4);opacity:0}}
+.map .lbl{font-family:var(--f-body);font-size:10px;fill:var(--ink);font-weight:600}
+.map .ob{font-family:var(--f-display);font-style:italic;font-size:12px;fill:var(--muted)}
+.mlogo{position:absolute;left:10px;top:10px;width:54px;height:54px;border-radius:50%;background:#fff;display:grid;place-content:center;text-align:center;box-shadow:0 6px 16px -8px rgba(0,0,0,.35);color:#2b2b2b;font-family:var(--f-display);font-size:9px;letter-spacing:.22em;line-height:1;padding-left:.22em}
+.mlogo small{font-family:var(--f-body);font-size:5px;letter-spacing:.12em;margin-top:3px;color:#777}
+.choose button{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+.choose button:nth-child(2){animation-delay:.1s}
+.choose button:nth-child(3){animation-delay:.2s}
+.cimg .map{height:100%}
+.bcard .map{border-radius:4px;aspect-ratio:16/9;margin-bottom:4px}
+.reveal{transition:transform .9s cubic-bezier(.2,.7,.2,1),opacity .9s}
+.reveal.pre{transform:translateY(24px);opacity:.35}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal.pre{transform:none;opacity:1}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="leaf" viewBox="0 0 400 400"><g fill="currentColor">
+      <path d="M40 380C90 300 120 220 140 120c4-20 10-40 18-58l6 2c-8 18-13 37-17 57-20 101-51 182-102 262z"/>
+      <ellipse cx="128" cy="110" rx="18" ry="60" transform="rotate(-30 128 110)"/>
+      <ellipse cx="176" cy="150" rx="16" ry="55" transform="rotate(40 176 150)"/>
+      <ellipse cx="110" cy="200" rx="17" ry="58" transform="rotate(-45 110 200)"/>
+      <ellipse cx="158" cy="232" rx="15" ry="52" transform="rotate(50 158 232)"/>
+      <ellipse cx="92" cy="282" rx="15" ry="50" transform="rotate(-50 92 282)"/>
+      <ellipse cx="150" cy="60" rx="14" ry="48" transform="rotate(10 150 60)"/>
+      <path d="M260 400c20-80 50-150 100-210l5 4c-49 59-79 128-99 207z"/>
+      <ellipse cx="330" cy="230" rx="22" ry="50" transform="rotate(35 330 230)"/>
+      <ellipse cx="300" cy="290" rx="20" ry="46" transform="rotate(-35 300 290)"/>
+      <ellipse cx="370" cy="180" rx="18" ry="42" transform="rotate(60 370 180)"/>
+    </g></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3z"/></symbol>
+    <symbol id="i-tg" viewBox="0 0 24 24"><path fill="currentColor" d="M21.9 4.3 18.7 19c-.2 1-.9 1.3-1.7.8l-4.8-3.5-2.3 2.2c-.3.3-.5.5-1 .5l.3-4.9 8.9-8c.4-.3-.1-.5-.6-.2L6.4 12.8 1.7 11.3c-1-.3-1-1 .2-1.5L20.6 2.6c.9-.3 1.6.2 1.3 1.7z"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.2 2 11.4c0 2.8 1.3 5.3 3.4 7L4.6 22l3.9-2a10.6 10.6 0 0 0 3.5.6c5.5 0 10-4.2 10-9.3S17.5 2 12 2zm0 16.6c-1.1 0-2.2-.2-3.2-.6l-.4-.1-1.6.8.3-1.5-.4-.3a7.4 7.4 0 0 1-2.9-5.5c0-4.2 3.7-7.6 8.2-7.6s8.2 3.4 8.2 7.6-3.7 7.2-8.2 7.2zM8 9.3h1.6l2.4 3.4 2.4-3.4H16v5.8h-1.5v-3.5L12 15l-2.5-3.4v3.5H8z"/></symbol>
+    <symbol id="i-ph" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.2 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.2.2 2.4.6 3.6a1 1 0 0 1-.3 1z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></symbol>
+  </defs>
+</svg>
+
+<div class="progress" id="progress"></div>
+<header>
+  <div class="wrap hbar">
+    <a href="#glavnaya" class="logo" aria-label="Famous — на главную">Famous<small>салон красоты</small></a>
+    <nav class="main" id="nav">
+      <button class="nav-close" id="navClose" aria-label="Закрыть меню">✕</button>
+      <a href="#glavnaya">Главная</a>
+      <a href="#uslugi">Услуги</a>
+      <a href="#ceny">Цены</a>
+      <a href="#raboty">Работы</a>
+      <a href="#kontakty">Контакты</a>
+    </nav>
+    <button class="branch-pill" id="pillBtn" aria-label="Сменить филиал"><span class="dot"></span><span class="txt" id="pillTxt">Выбрать филиал</span></button>
+    <button class="burger" id="burger" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main>
+<!-- ================= ГЛАВНАЯ ================= -->
+<div class="view" id="v-glavnaya">
+  <section class="hero">
+    <svg class="leaves" viewBox="0 0 400 400" preserveAspectRatio="xMaxYMin slice" style="color:var(--sage-soft)"><use href="#leaf"/></svg>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Новосибирск · три филиала</p>
+        <h1><span class="logo">Famous</span>Волосы, ногти и брови <em>в одном салоне</em></h1>
+        <p class="lead">Окрашивание в сложных техниках, тотал блонд, маникюр с палитрой Luxio больше 200 оттенков и архитектура бровей. Стерильные инструменты и мастера, которые подбирают решение под вас.</p>
+        <div class="hero-meta">
+          <span>Ежедневно <b class="mono">10:00–21:00</b></span>
+          <span>Ваш филиал: <b id="heroBranch">—</b></span>
+        </div>
+        <div class="cta-row">
+          <button class="btn sage" data-call>Позвонить</button>
+          <a class="btn ghost" href="#ceny">Смотреть цены</a>
+        </div>
+      </div>
+      <div class="hero-photos">
+        <figure class="p1"><img src="img/hair-4.jpg" alt="Блонд после окрашивания в Famous"></figure>
+        <figure class="p2"><img src="img/nail-5.jpg" alt="Френч-маникюр"></figure>
+        <div class="stamp"><span class="mono">4,9–5,0</span>3 174 оценки в 2ГИС</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true"><div class="marquee-track">
+    <span>airtouch</span><span>шатуш</span><span>тотал блонд</span><span>контуринг</span><span>выход из тёмного</span><span>френч</span><span>гель-лак</span><span>ламинирование бровей</span>
+    <span>airtouch</span><span>шатуш</span><span>тотал блонд</span><span>контуринг</span><span>выход из тёмного</span><span>френч</span><span>гель-лак</span><span>ламинирование бровей</span>
+  </div></div>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head reveal"><p class="eyebrow">Направления</p><h2>Что мы делаем <em>лучше всего</em></h2></div>
+      <div class="dirs">
+        <a class="dir reveal" href="#uslugi"><div class="ph"><img src="img/hair-1.jpg" alt="Окрашивание волос" loading="lazy"></div><div class="cap"><h3>Окрашивание</h3><span class="from">от 5 800 ₽</span></div></a>
+        <a class="dir reveal" href="#uslugi"><div class="ph"><img src="img/blond-3.jpg" alt="Тотал блонд" loading="lazy"></div><div class="cap"><h3>Тотал блонд</h3><span class="from">8 600 ₽</span></div></a>
+        <a class="dir reveal" href="#uslugi"><div class="ph"><img src="img/nail-3.jpg" alt="Маникюр" loading="lazy"></div><div class="cap"><h3>Маникюр и педикюр</h3><span class="from">от 1 000 ₽</span></div></a>
+        <a class="dir reveal" href="#uslugi"><div class="ph"><img src="img/brow-6.jpg" alt="Брови" loading="lazy"></div><div class="cap"><h3>Брови и ресницы</h3><span class="from">от 700 ₽</span></div></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <svg class="leaves" viewBox="0 0 400 400" preserveAspectRatio="xMinYMax slice" style="transform:scaleX(-1)"><use href="#leaf"/></svg>
+    <div class="wrap" style="position:relative">
+      <div class="sec-head reveal"><p class="eyebrow">О салоне</p><h2>Famous <em>в цифрах</em></h2></div>
+      <div class="about reveal">
+        <div><span class="k">200+</span><p>оттенков в палитре Luxio для маникюра и педикюра</p></div>
+        <div><span class="k">3</span><p>филиала: Центральный, Дзержинский и Ленинский районы</p></div>
+        <div><span class="k">3 174</span><p>оценки в 2ГИС, средний рейтинг филиалов 4,9–5,0</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head reveal"><p class="eyebrow">Работы мастеров</p><h2>Результат, <em>который видно</em></h2></div>
+      <div class="show">
+        <figure class="reveal"><img src="img/blond-3.jpg" alt="Тотал блонд" loading="lazy"><figcaption>Тотал блонд</figcaption></figure>
+        <figure class="reveal"><img src="img/hair-5.jpg" alt="Сложное окрашивание" loading="lazy"><figcaption>Окрашивание</figcaption></figure>
+        <figure class="reveal"><img src="img/nail-1.jpg" alt="Маникюр с френчем" loading="lazy"><figcaption>Маникюр</figcaption></figure>
+        <figure class="reveal"><img src="img/brow-6.jpg" alt="Архитектура бровей" loading="lazy"><figcaption>Брови</figcaption></figure>
+        <figure class="reveal"><img src="img/hair-2.jpg" alt="Пепельный блонд" loading="lazy"><figcaption>Блонд</figcaption></figure>
+      </div>
+      <div class="cta-row reveal" style="justify-content:center"><a class="btn ghost" href="#raboty">Все работы</a></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head reveal"><p class="eyebrow">Написать в ваш филиал</p><h2>Ответим <em>в мессенджере</em></h2></div>
+      <div class="msg reveal" data-msg></div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= УСЛУГИ ================= -->
+<div class="view" id="v-uslugi">
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Услуги</p><h2>Четыре направления <em>Famous</em></h2><p class="lead">Описания и цены, которые салон публикует в 2ГИС. Точную стоимость окрашивания мастер называет после консультации: она зависит от длины и густоты волос.</p></div>
+
+      <article class="svc reveal">
+        <div class="svc-ph"><img src="img/hair-2.jpg" alt="Окрашивание волос" loading="lazy"><img src="img/hair-6.jpg" alt="Окрашивание волос" loading="lazy"></div>
+        <div class="svc-body">
+          <p class="eyebrow">Волосы</p><h3>Окрашивание волос</h3>
+          <div class="svc-price"><span class="mono">от 5 800 ₽</span></div>
+          <p>Окрашивание помогает создать красивый, живой цвет с мягкими переходами и ухоженным эффектом. В FAMOUS мы создаём окрашивание, которое подчёркивает внешность и делает образ современным.</p>
+          <p>Хотите обновить цвет без резких переходов? Приходите, и мы подберём окрашивание для вас.</p>
+        </div>
+      </article>
+
+      <article class="svc reveal">
+        <div class="svc-ph"><img src="img/hair-5.jpg" alt="Сложное окрашивание" loading="lazy"><img src="img/hair-7.jpg" alt="Сложное окрашивание" loading="lazy"></div>
+        <div class="svc-body">
+          <p class="eyebrow">Волосы</p><h3>Сложное окрашивание</h3>
+          <div class="svc-price"><span class="mono">от 8 600 ₽</span></div>
+          <p>Способ создать красивый, многогранный цвет волос с мягкими переходами. Делаем сложное окрашивание аккуратно, бережно и с вниманием к деталям, чтобы результат выглядел красиво, современно и дорого.</p>
+          <div class="tags"><span>airtouch</span><span>шатуш</span><span>растяжка цвета</span><span>контуринг</span><span>выход из тёмного</span></div>
+        </div>
+      </article>
+
+      <article class="svc reveal">
+        <div class="svc-ph"><img src="img/blond-1.jpg" alt="Тотал блонд" loading="lazy"><img src="img/blond-5.jpg" alt="Тотал блонд" loading="lazy"></div>
+        <div class="svc-body">
+          <p class="eyebrow">Волосы</p><h3>Тотал блонд</h3>
+          <div class="svc-price"><span class="mono">8 600 ₽</span></div>
+          <p>Сложное окрашивание в блонд по всей длине волос с бережным осветлением и тонированием. Подбираем оттенок индивидуально и работаем с качеством волос, чтобы результат выглядел чисто, дорого и ухоженно.</p>
+        </div>
+      </article>
+
+      <article class="svc reveal">
+        <div class="svc-ph"><img src="img/nail-1.jpg" alt="Маникюр с чёрным френчем" loading="lazy"><img src="img/pedi-1.jpg" alt="Педикюр" loading="lazy"></div>
+        <div class="svc-body">
+          <p class="eyebrow">Ногти</p><h3>Маникюр и педикюр</h3>
+          <div class="svc-price"><span class="mono">от 1 000 ₽</span></div>
+          <p>Аккуратный маникюр и педикюр с вниманием к каждой детали: форме, обработке, покрытию и комфорту клиента. Работаем стерильными инструментами и качественными материалами.</p>
+          <p>В нашей палитре Luxio больше 200 цветов.</p>
+          <div class="tags"><span>классический</span><span>гель-лак</span><span>укрепление</span><span>френч</span><span>дизайн</span></div>
+        </div>
+      </article>
+
+      <article class="svc reveal">
+        <div class="svc-ph"><img src="img/brow-2.jpg" alt="Архитектура бровей" loading="lazy"><img src="img/brow-7.jpg" alt="Брови" loading="lazy"></div>
+        <div class="svc-body">
+          <p class="eyebrow">Брови и ресницы</p><h3>Брови</h3>
+          <div class="svc-price"><span class="mono">от 1 300 ₽</span><a href="#ceny" style="font-size:.85rem;color:var(--muted)">полный прайс →</a></div>
+          <p>Архитектура и окрашивание бровей делают взгляд выразительнее, а лицо ухоженным и гармоничным. Мастер подбирает форму, убирает лишние волоски и окрашивает краской или хной, чтобы брови выглядели естественно и не перегружали образ.</p>
+          <div class="tags"><span>архитектура</span><span>краска / хна</span><span>ламинирование</span><span>ресницы</span><span>воск</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+</div>
+
+<!-- ================= ЦЕНЫ ================= -->
+<div class="view" id="v-ceny">
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Цены</p><h2>Прайс <em>салона</em></h2></div>
+      <div class="price-wrap">
+        <div class="pcard reveal">
+          <svg class="leafshade" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" style="color:var(--sage-deep)"><use href="#leaf"/></svg>
+          <h3>Прайс волосы</h3>
+          <ul>
+            <li><span>Окрашивание волос</span><span class="v">от 5 800</span></li>
+            <li><span>Сложное окрашивание (airtouch, шатуш, контуринг)</span><span class="v">от 8 600</span></li>
+            <li><span>Тотал блонд</span><span class="v">8 600</span></li>
+          </ul>
+          <h3 style="margin-top:34px">Прайс ногти</h3>
+          <ul>
+            <li><span>Маникюр</span><span class="v">от 1 000</span></li>
+            <li><span>Педикюр</span><span class="v">по прайсу</span></li>
+          </ul>
+          <div class="sig logo">Famous<small>салон красоты</small></div>
+        </div>
+        <div class="pcard reveal">
+          <svg class="leafshade" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" style="color:var(--sage-deep);transform:scaleX(-1)"><use href="#leaf"/></svg>
+          <h3>Прайс брови</h3>
+          <ul>
+            <li><span>Архитектура + окрашивание краска / хна</span><span class="v">1300/1500</span></li>
+            <li><span>Окрашивание бровей краской / хной</span><span class="v">800/900</span></li>
+            <li><span>Архитектура бровей</span><span class="v">800</span></li>
+            <li><span>Ламинирование бровей с окрашиванием / без</span><span class="v">2250/2000</span></li>
+            <li><span>Окрашивание ресниц</span><span class="v">700</span></li>
+            <li><span>Ламинирование ресниц</span><span class="v">2500</span></li>
+            <li><span>Зона лица воск</span><span class="v">450</span></li>
+          </ul>
+          <div class="sig logo">Famous<small>салон красоты</small></div>
+        </div>
+      </div>
+      <p class="note">Цены в рублях. Стоимость окрашивания зависит от длины и густоты волос, точную сумму мастер назовёт на консультации. Уточнить цену и свободное время можно по телефону или в мессенджере вашего филиала.</p>
+      <div class="cta-row"><button class="btn sage" data-call>Позвонить и уточнить</button></div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= РАБОТЫ ================= -->
+<div class="view" id="v-raboty">
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Портфолио</p><h2>Работы <em>мастеров</em></h2></div>
+      <div class="filters" role="group" aria-label="Фильтр работ">
+        <button aria-pressed="true" data-f="all">Все</button>
+        <button aria-pressed="false" data-f="hair">Окрашивание</button>
+        <button aria-pressed="false" data-f="blond">Блонд</button>
+        <button aria-pressed="false" data-f="ba">До / после</button>
+        <button aria-pressed="false" data-f="nail">Ногти</button>
+        <button aria-pressed="false" data-f="brow">Брови</button>
+      </div>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= КОНТАКТЫ ================= -->
+<div class="view" id="v-kontakty">
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Контакты</p><h2>Три филиала <em>Famous</em></h2><p class="lead">У каждого филиала свой номер для звонков и мессенджеров. Единый номер работает для всех адресов.</p></div>
+      <div class="branches" id="branches"></div>
+      <div class="unified reveal">
+        <div><p class="eyebrow" style="margin:0 0 4px">Единый номер</p><span class="mono">+7 (383) 209-39-20</span><div style="font-size:.85rem;color:var(--muted)">пн–вс 10:00–21:00</div></div>
+        <div><p class="eyebrow" style="margin:0 0 4px">Почта</p><a href="mailto:famous.beauty@mail.ru" class="mono" style="font-size:1rem">famous.beauty@mail.ru</a></div>
+        <button class="btn sage" data-call>Позвонить</button>
+      </div>
+    </div>
+  </section>
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Мессенджеры выбранного филиала</p><h2 id="msgTitle">Написать</h2></div>
+      <div class="msg" data-msg></div>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer>
+  <div class="wrap fgrid">
+    <div><div class="logo" style="font-size:1.6rem">Famous<small>салон красоты</small></div><p style="margin-top:16px;color:var(--muted)">Новосибирск. Ежедневно 10:00–21:00.</p></div>
+    <div><h4>Филиалы</h4><p>Семьи Шамшиных, 26<br>Фрунзе, 228 (ЖК Созвездие)<br>Проспект Карла Маркса, 51</p></div>
+    <div><h4>Связь</h4><p class="mono">+7 (383) 209-39-20</p><p class="mono" id="footBranch"></p><p>famous.beauty@mail.ru</p></div>
+  </div>
+</footer>
+
+<div class="dock" id="dock">
+  <button class="call" data-call><svg><use href="#i-ph"/></svg>Позвонить</button>
+  <a id="dockWa" target="_blank" rel="noopener" aria-label="WhatsApp"><svg><use href="#i-wa"/></svg></a>
+  <a id="dockTg" target="_blank" rel="noopener" aria-label="Telegram"><svg><use href="#i-tg"/></svg></a>
+  <button id="dockBranch" aria-label="Сменить филиал"><svg><use href="#i-pin"/></svg></button>
+</div>
+
+<!-- выбор филиала -->
+<div class="overlay" id="chooser" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="chooseQ">
+    <div class="logo">Famous<small>салон красоты</small></div>
+    <p class="q" id="chooseQ">В какой филиал вы хотите прийти?</p>
+    <div class="choose" id="chooseList"></div>
+  </div>
+</div>
+
+<!-- выбор номера -->
+<div class="overlay" id="caller" hidden>
+  <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="callQ">
+    <button class="x" data-close aria-label="Закрыть">✕</button>
+    <p class="eyebrow">Позвонить</p>
+    <h3 id="callQ" style="font-size:2rem;margin-top:6px">Куда позвонить?</h3>
+    <div class="callopt" id="callOpts"></div>
+    <p class="copy" id="copyNote">Номер можно скопировать: нажмите и удерживайте.</p>
+  </div>
+</div>
+
+<div class="lightbox" id="lb" hidden>
+  <img id="lbImg" alt="">
+  <button class="lb-close" aria-label="Закрыть">✕</button>
+  <button class="lb-prev" aria-label="Предыдущее фото">←</button>
+  <button class="lb-next" aria-label="Следующее фото">→</button>
+</div>
+
+<script>
+(function(){
+const UNIFIED={label:"Единый номер",num:"+7 (383) 209-39-20",tel:"+73832093920",note:"для всех филиалов · пн–вс 10:00–21:00"};
+const BRANCHES=[
+  {id:"shamshinyh",name:"Семьи Шамшиных, 26",short:"Шамшиных, 26",floor:"2 этаж",district:"Центральный район",rating:"4,9",votes:"1 590",phone:"+7 952 902-00-26",digits:"79529020026",img:"img/hair-3.jpg",map:"https://2gis.ru/novosibirsk/search/Famous%20%D0%A1%D0%B5%D0%BC%D1%8C%D0%B8%20%D0%A8%D0%B0%D0%BC%D1%88%D0%B8%D0%BD%D1%8B%D1%85%2026"},
+  {id:"frunze",name:"Фрунзе, 228",short:"Фрунзе, 228",floor:"ЖК Созвездие · офис 24, 2 этаж",district:"Дзержинский район",rating:"5,0",votes:"714",phone:"+7 953 769-16-98",digits:"79537691698",img:"img/nail-4.jpg",map:"https://2gis.ru/novosibirsk/search/Famous%20%D0%A4%D1%80%D1%83%D0%BD%D0%B7%D0%B5%20228"},
+  {id:"marksa",name:"Проспект Карла Маркса, 51",short:"К. Маркса, 51",floor:"2 этаж",district:"Ленинский район",rating:"5,0",votes:"870",phone:"+7 999 452-66-85",digits:"79994526685",img:"img/brow-3.jpg",map:"https://2gis.ru/novosibirsk/search/Famous%20%D0%9A%D0%B0%D1%80%D0%BB%D0%B0%20%D0%9C%D0%B0%D1%80%D0%BA%D1%81%D0%B0%2051"}
+];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let cur=null;
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  sget(k){try{return sessionStorage.getItem(k)}catch(e){return null}},sset(k,v){try{sessionStorage.setItem(k,v)}catch(e){}}};
+
+/* схема Новосибирска: Обь, мосты, три филиала (x/y по реальным координатам) */
+const POS={shamshinyh:[160,80],frunze:[246,40],marksa:[74,170]};
+function mapSVG(activeId,withLogo=true){
+  const pins=BRANCHES.map(b=>{const [x,y]=POS[b.id];return b.id===activeId
+    ?`<circle class="ring" cx="${x}" cy="${y}" r="9"/><path class="pin-a" d="M${x} ${y+1}c-6-7-9-11-9-15a9 9 0 0 1 18 0c0 4-3 8-9 15z"/><circle cx="${x}" cy="${y-14}" r="3.4" fill="var(--map)"/><text class="lbl" x="${x+ (x>200?-12:12)}" y="${y-18}" text-anchor="${x>200?"end":"start"}">${b.short}</text>`
+    :`<circle class="pin-o" cx="${x}" cy="${y}" r="5"/>`}).join("");
+  return `<div class="map">${withLogo?'<div class="mlogo">FAMOUS<small>салон красоты</small></div>':''}
+  <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path class="st thin" d="M0 60 L320 30 M0 130 L320 100 M0 185 L320 160 M40 0 L70 200 M200 0 L230 200 M280 0 L300 200"/>
+    <path class="st" d="M150 200 L170 0 M0 95 L320 70 M120 200 L60 120 L20 0 M210 0 C230 60 260 110 320 140"/>
+    <path class="river" d="M240 200 C195 160 150 130 128 110 S96 62 84 44 S40 14 18 0"/>
+    <path class="river2" d="M240 200 C195 160 150 130 128 110 S96 62 84 44 S40 14 18 0"/>
+    <path class="st" d="M112 96 L146 124 M176 156 L206 184 M70 50 L100 36" style="stroke:var(--muted);opacity:.5"/>
+    <text class="ob" x="196" y="150" transform="rotate(38 196 150)">р. Обь</text>
+    ${pins}
+  </svg></div>`;
+}
+const links=b=>({wa:"https://wa.me/"+b.digits,tg:"https://t.me/+"+b.digits,max:"https://max.ru/"});
+
+/* ---------- branch chooser ---------- */
+$("#chooseList").innerHTML=BRANCHES.map(b=>`
+  <button data-b="${b.id}">
+    <div class="cimg">${mapSVG(b.id)}</div>
+    <div class="ctxt"><b>${b.name}</b><span>${b.district} · ${b.floor}</span><i>★ ${b.rating} · ${b.votes} оценок</i></div>
+  </button>`).join("");
+$$("#chooseList button").forEach(btn=>btn.onclick=()=>{setBranch(btn.dataset.b);store.sset("famous_chosen","1");$("#chooser").hidden=true});
+function openChooser(){$("#chooser").hidden=false}
+$("#pillBtn").onclick=openChooser; $("#dockBranch").onclick=openChooser;
+
+function setBranch(id){
+  cur=BRANCHES.find(b=>b.id===id)||BRANCHES[0]; store.set("famous_branch",cur.id);
+  const L=links(cur);
+  $("#pillTxt").textContent=cur.short; $("#heroBranch").textContent=cur.name;
+  $("#footBranch").textContent=cur.phone+" · "+cur.short;
+  $("#dockWa").href=L.wa; $("#dockTg").href=L.tg;
+  $("#msgTitle").innerHTML=`Написать <em>на ${cur.short}</em>`;
+  $$("[data-msg]").forEach(el=>el.innerHTML=`
+    <a href="${L.wa}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg><span><b>WhatsApp</b><small>${cur.phone}</small></span></a>
+    <a href="${L.tg}" target="_blank" rel="noopener"><svg><use href="#i-tg"/></svg><span><b>Telegram</b><small>${cur.phone}</small></span></a>
+    <a href="${L.max}" target="_blank" rel="noopener" data-copy="${cur.phone}"><svg><use href="#i-max"/></svg><span><b>Max</b><small>${cur.phone}</small></span></a>`);
+  $$("[data-copy]").forEach(a=>a.addEventListener("click",()=>{try{navigator.clipboard.writeText(a.dataset.copy).catch(()=>{})}catch(e){}}));
+  renderBranches();
+}
+function renderBranches(){
+  $("#branches").innerHTML=BRANCHES.map(b=>{const L=links(b),c=cur&&cur.id===b.id;return `
+  <div class="bcard ${c?"current":""}">
+    ${mapSVG(b.id,false)}
+    ${c?'<span class="badge">ваш филиал</span>':'<span class="badge" style="visibility:hidden">—</span>'}
+    <h3>${b.name}</h3>
+    <p class="addr">${b.floor}<br>${b.district}, Новосибирск</p>
+    <div class="rate">★ <b>${b.rating}</b> · ${b.votes} оценок в 2ГИС</div>
+    <div class="ph">${b.phone}</div>
+    <div class="acts">
+      ${c?"":`<button class="pick" data-pick="${b.id}">Выбрать</button>`}
+      <a href="tel:+${b.digits}">Позвонить</a>
+      <a href="${L.wa}" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="${L.tg}" target="_blank" rel="noopener">Telegram</a>
+      <a href="${b.map}" target="_blank" rel="noopener">Маршрут</a>
+    </div>
+  </div>`}).join("");
+  $$("[data-pick]").forEach(x=>x.onclick=()=>setBranch(x.dataset.pick));
+}
+
+/* ---------- call chooser: единый или филиал ---------- */
+function openCaller(){
+  const opts=[UNIFIED,{label:"Филиал "+cur.short,num:cur.phone,tel:"+"+cur.digits,note:cur.district+" · также WhatsApp, Telegram, Max"}];
+  $("#callOpts").innerHTML=opts.map(o=>`<a href="tel:${o.tel}"><span class="mono">${o.num}</span><small>${o.label} — ${o.note}</small><span class="go">позвонить</span></a>`).join("");
+  $("#caller").hidden=false;
+}
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-call]")){e.preventDefault();openCaller()}
+  if(e.target.closest("[data-close]")||e.target.id==="caller")$("#caller").hidden=true;
+  if(e.target.id==="chooser"&&cur)$("#chooser").hidden=true;
+});
+
+/* ---------- gallery ---------- */
+const G=[
+ ...["hair-1","hair-2","hair-3","hair-4","hair-5","hair-6","hair-7"].map(s=>[s,"hair","Окрашивание"]),
+ ...["blond-1","blond-2","blond-3","blond-4","blond-5","blond-6"].map(s=>[s,"blond","Тотал блонд"]),
+ ...["ba-2","ba-3"].map(s=>[s,"ba","До и после"]),
+ ...["nail-1","nail-2","nail-3","nail-4","nail-5","pedi-1"].map(s=>[s,"nail","Маникюр и педикюр"]),
+ ...["brow-1","brow-2","brow-3","brow-4","brow-5","brow-6","brow-7"].map(s=>[s,"brow","Брови"])
+];
+// перемешиваем категории для красивой сетки
+const order=[];const groups={};G.forEach(g=>(groups[g[1]]=groups[g[1]]||[]).push(g));
+let more=true,i=0;while(more){more=false;for(const k in groups){if(groups[k][i]){order.push(groups[k][i]);more=true}}i++}
+$("#gallery").innerHTML=order.map((g,n)=>`<figure data-c="${g[1]}" data-n="${n}"><img src="img/${g[0]}.jpg" alt="${g[2]}" loading="lazy"></figure>`).join("");
+$$(".filters button").forEach(b=>b.onclick=()=>{
+  $$(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $$("#gallery figure").forEach(f=>f.hidden=!(b.dataset.f==="all"||f.dataset.c===b.dataset.f));
+});
+let lbList=[],lbI=0;
+function lbShow(){const f=lbList[lbI];$("#lbImg").src=f.querySelector("img").src;$("#lbImg").alt=f.querySelector("img").alt}
+$("#gallery").addEventListener("click",e=>{const f=e.target.closest("figure");if(!f)return;lbList=$$("#gallery figure").filter(x=>!x.hidden);lbI=lbList.indexOf(f);lbShow();$("#lb").hidden=false});
+$(".lb-close").onclick=()=>$("#lb").hidden=true;
+$(".lb-prev").onclick=()=>{lbI=(lbI-1+lbList.length)%lbList.length;lbShow()};
+$(".lb-next").onclick=()=>{lbI=(lbI+1)%lbList.length;lbShow()};
+$("#lb").addEventListener("click",e=>{if(e.target.id==="lb")$("#lb").hidden=true});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("#lb").hidden=true;$("#caller").hidden=true;if(cur)$("#chooser").hidden=true;$("#nav").classList.remove("open")}
+  if(!$("#lb").hidden){if(e.key==="ArrowLeft")$(".lb-prev").click();if(e.key==="ArrowRight")$(".lb-next").click()}});
+
+/* ---------- pages ---------- */
+const PAGES=["glavnaya","uslugi","ceny","raboty","kontakty"];
+function route(){
+  const p=PAGES.includes(location.hash.slice(1))?location.hash.slice(1):"glavnaya";
+  $$(".view").forEach(v=>v.classList.toggle("active",v.id==="v-"+p));
+  $$("nav.main a").forEach(a=>{if(a.getAttribute("href")==="#"+p)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  $("#nav").classList.remove("open");
+  window.scrollTo({top:0,behavior:"instant"});
+  revealSetup();
+}
+window.addEventListener("hashchange",route);
+$("#burger").onclick=()=>$("#nav").classList.add("open");
+$("#navClose").onclick=()=>$("#nav").classList.remove("open");
+
+/* ---------- reveal on scroll (resting state visible) ---------- */
+let io;
+function revealSetup(){
+  if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  io&&io.disconnect();
+  io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.remove("pre");io.unobserve(en.target)}}),{threshold:.12});
+  $$(".view.active .reveal").forEach(el=>{const r=el.getBoundingClientRect();if(r.top>innerHeight){el.classList.add("pre");io.observe(el)}});
+}
+
+/* ---------- scroll progress ---------- */
+addEventListener("scroll",()=>{const h=document.documentElement.scrollHeight-innerHeight;$("#progress").style.transform=`scaleX(${h>0?scrollY/h:0})`},{passive:true});
+
+/* ---------- init ---------- */
+setBranch(store.get("famous_branch")||BRANCHES[0].id);
+route();
+openChooser();
+})();
+</script>
