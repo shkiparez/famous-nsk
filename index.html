@@ -312,6 +312,23 @@ footer{border-top:1px solid var(--line);padding-block:44px calc(110px + env(safe
 .choose button:nth-child(3){animation-delay:.2s}
 .cimg .map{height:100%}
 .bcard .map{border-radius:4px;aspect-ratio:16/9;margin-bottom:4px}
+/* ---------- v3: живой фон ---------- */
+#bgfx{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.grain{position:fixed;inset:-50%;width:200%;height:200%;z-index:100;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 1.2s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}}
+.hero::before,.hero::after{display:none}
+.dir,.show figure{transform-style:preserve-3d;will-change:transform}
+.dir .ph img,.show img{transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.sec-head h2{position:relative;padding-bottom:18px}
+.sec-head h2::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:90px;background:linear-gradient(90deg,var(--sage),var(--blush-ink));transform-origin:0 50%;animation:line 1.4s .3s cubic-bezier(.2,.7,.2,1) both}
+@keyframes line{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.band h2 em,.sec-head h2 em{background:linear-gradient(100deg,var(--sage-deep),var(--blush-ink),var(--sage-deep));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s linear infinite}
+.band h2 em{background-image:linear-gradient(100deg,var(--blush-ink),var(--on-forest),var(--blush-ink))}
+.btn.sage{position:relative;overflow:hidden}
+.btn.sage::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(-120%);animation:shine 4.5s 1.5s ease-in-out infinite}
+@keyframes shine{40%,100%{transform:translateX(120%)}}
+.dock .call{animation:pulse 2.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--sage) 60%,transparent)}50%{box-shadow:0 0 0 8px transparent}}
 .reveal{transition:transform .9s cubic-bezier(.2,.7,.2,1),opacity .9s}
 .reveal.pre{transform:translateY(24px);opacity:.35}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.reveal.pre{transform:none;opacity:1}}
@@ -340,6 +357,8 @@ footer{border-top:1px solid var(--line);padding-block:44px calc(110px + env(safe
   </defs>
 </svg>
 
+<canvas id="bgfx" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
 <div class="progress" id="progress"></div>
 <header>
   <div class="wrap hbar">
@@ -753,6 +772,46 @@ function revealSetup(){
   io&&io.disconnect();
   io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.remove("pre");io.unobserve(en.target)}}),{threshold:.12});
   $$(".view.active .reveal").forEach(el=>{const r=el.getBoundingClientRect();if(r.top>innerHeight){el.classList.add("pre");io.observe(el)}});
+}
+
+/* ---------- живой фон: светящиеся пятна, падающие листья, свет за курсором ---------- */
+(function(){
+  const cv=$("#bgfx"),ctx=cv.getContext("2d");
+  const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  let W,H,dpr,C={},mx=-999,my=-999,tx=-999,ty=-999,t=0;
+  function hexA(c,a){c=c.trim();if(c.startsWith("#")){let h=c.slice(1);if(h.length===3)h=h.split("").map(x=>x+x).join("");const n=parseInt(h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}return c}
+  function readColors(){const s=getComputedStyle(document.documentElement);C={sage:s.getPropertyValue("--sage"),blush:s.getPropertyValue("--blush-ink"),soft:s.getPropertyValue("--sage-soft"),deep:s.getPropertyValue("--sage-deep"),dark:matchMedia("(prefers-color-scheme:dark)").matches&&document.documentElement.dataset.theme!=="light"||document.documentElement.dataset.theme==="dark"}}
+  function size(){dpr=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+  const leaves=Array.from({length:Math.min(28,Math.round(innerWidth/50))},()=>mk(true));
+  function mk(init){return{x:Math.random()*innerWidth,y:init?Math.random()*innerHeight:-30,s:6+Math.random()*12,vy:.18+Math.random()*.35,sw:Math.random()*6.28,r:Math.random()*6.28,vr:(Math.random()-.5)*.012,c:Math.random()<.35?"blush":"sage",a:.18+Math.random()*.25}}
+  const blobs=[{c:"sage",r:.55,px:.15,py:.2,fx:.00013,fy:.00009},{c:"blush",r:.45,px:.85,py:.35,fx:.0001,fy:.00014},{c:"deep",r:.5,px:.5,py:.9,fx:.00008,fy:.00011}];
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const ba=C.dark?.16:.22;
+    blobs.forEach((b,i)=>{const x=W*(b.px+Math.sin(t*b.fx*1000+i)*.12),y=H*(b.py+Math.cos(t*b.fy*1000+i*2)*.12),R=Math.max(W,H)*b.r;
+      const g=ctx.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,hexA(C[b.c],ba));g.addColorStop(1,hexA(C[b.c],0));ctx.fillStyle=g;ctx.fillRect(0,0,W,H)});
+    tx+=(mx-tx)*.08;ty+=(my-ty)*.08;
+    if(tx>-500){const g=ctx.createRadialGradient(tx,ty,0,tx,ty,260);g.addColorStop(0,hexA(C.blush,C.dark?.13:.12));g.addColorStop(1,hexA(C.blush,0));ctx.fillStyle=g;ctx.fillRect(tx-260,ty-260,520,520)}
+    leaves.forEach((l,i)=>{l.y+=l.vy;l.sw+=.01;l.r+=l.vr;const x=l.x+Math.sin(l.sw)*22;
+      const dx=x-tx,dy=l.y-ty,d=Math.hypot(dx,dy);if(d<120){l.x+=dx/d*1.2;l.y+=dy/d*.6}
+      ctx.save();ctx.translate(x,l.y);ctx.rotate(l.r);ctx.fillStyle=hexA(C[l.c],l.a*(C.dark?.8:1));
+      ctx.beginPath();ctx.ellipse(0,0,l.s*.38,l.s,0,0,6.283);ctx.fill();
+      ctx.strokeStyle=hexA(C.dark?"#000000":"#ffffff",.25);ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(0,-l.s);ctx.lineTo(0,l.s);ctx.stroke();ctx.restore();
+      if(l.y>H+30)leaves[i]=mk(false)});
+  }
+  let last=0;function loop(ts){t=ts/1000;if(ts-last>1000){readColors();last=ts}frame();if(!document.hidden)raf=requestAnimationFrame(loop)}
+  let raf;readColors();size();addEventListener("resize",size);
+  addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY},{passive:true});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!still)raf=requestAnimationFrame(loop)});
+  if(still)frame();else raf=requestAnimationFrame(loop);
+})();
+
+/* ---------- 3D-наклон карточек за курсором ---------- */
+if(matchMedia("(hover:hover)").matches&&!matchMedia("(prefers-reduced-motion:reduce)").matches){
+  document.addEventListener("pointermove",e=>{const el=e.target.closest(".dir,.show figure");if(!el)return;
+    const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    el.style.transform=`perspective(900px) rotateY(${x*7}deg) rotateX(${-y*7}deg) translateY(-6px)`});
+  document.addEventListener("pointerout",e=>{const el=e.target.closest(".dir,.show figure");if(el&&!el.contains(e.relatedTarget))el.style.transform=""});
 }
 
 /* ---------- scroll progress ---------- */
