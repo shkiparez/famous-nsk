@@ -500,6 +500,22 @@ footer{background:var(--forest);border-top:1px solid rgba(201,162,90,.3)}
 /* фон: меньше декора, золото */
 .bgdeco{display:none}
 .progress{background:linear-gradient(90deg,var(--gold-3),var(--gold-2))}
+
+/* ---------- 3D-фон и сияние ---------- */
+html{background:var(--bg)!important}
+body{background:transparent!important}
+.bg3d{position:fixed;inset:0;z-index:-2;pointer-events:none;perspective:900px;overflow:hidden}
+.bg3d-in{position:absolute;inset:-8%;background:linear-gradient(rgba(6,28,20,.5),rgba(6,28,20,.66)),url("img/marble.jpg") center/cover;transform:rotateX(calc(var(--py,0)*-6deg)) rotateY(calc(var(--px,0)*8deg)) scale(1.06);transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.bg3d::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,transparent 40%,rgba(3,16,11,.7))}
+.hero{background:linear-gradient(rgba(6,28,20,.0),rgba(6,28,20,.25))!important}
+#cursorGlow{position:fixed;left:0;top:0;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;pointer-events:none;z-index:45;opacity:0;transition:opacity .4s;background:radial-gradient(circle,rgba(240,214,150,.22),rgba(214,180,110,.08) 35%,transparent 65%);mix-blend-mode:screen}
+.trail{position:fixed;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#f0d696;box-shadow:0 0 8px 2px rgba(240,214,150,.8);pointer-events:none;z-index:46;animation:trail .9s ease-out forwards}
+@keyframes trail{to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}}
+.dir,.show figure,.bcard,.pcard,.msg a,.btn,.choose button,.tcard,.gallery figure,.unified,.band .about div{position:relative}
+.dir::before,.show figure::before,.bcard::before,.pcard::before,.msg a::before,.choose button::before,.gallery figure::before,.unified::before,.band .about div::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;opacity:0;transition:opacity .35s;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(240,214,150,.20),transparent 60%);mix-blend-mode:screen}
+.dir:hover::before,.show figure:hover::before,.bcard:hover::before,.pcard:hover::before,.msg a:hover::before,.choose button:hover::before,.gallery figure:hover::before,.unified:hover::before,.band .about div:hover::before{opacity:1}
+.show figure:first-child::before{border-radius:999px 999px 4px 4px}
+@media (hover:none){#cursorGlow{display:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -526,7 +542,9 @@ footer{background:var(--forest);border-top:1px solid rgba(201,162,90,.3)}
   </defs>
 </svg>
 
+<div class="bg3d" aria-hidden="true"><div class="bg3d-in"></div></div>
 <canvas id="bgfx" aria-hidden="true"></canvas>
+<div id="cursorGlow" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 <div class="progress" id="progress"></div>
 <header>
@@ -959,36 +977,64 @@ $$("[data-waves]").forEach(el=>{
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${d}</svg>`;
 });
 
-/* ---------- живой фон: светящиеся пятна, падающие листья, свет за курсором ---------- */
+/* ---------- 3D-фон: золотая волнистая поверхность и пыль в перспективе, камера следует за мышью ---------- */
 (function(){
   const cv=$("#bgfx"),ctx=cv.getContext("2d");
   const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  let W,H,dpr,C={},mx=-999,my=-999,tx=-999,ty=-999,t=0;
-  function hexA(c,a){c=c.trim();if(c.startsWith("#")){let h=c.slice(1);if(h.length===3)h=h.split("").map(x=>x+x).join("");const n=parseInt(h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}return c}
-  function readColors(){const s=getComputedStyle(document.documentElement);C={sage:s.getPropertyValue("--sage"),blush:s.getPropertyValue("--blush-ink"),soft:s.getPropertyValue("--sage-soft"),deep:s.getPropertyValue("--sage-deep"),dark:true}}
+  let W,H,dpr,mx=0,my=0,cx=0,cy=0,t=0,sy=0;
   function size(){dpr=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
-  const leaves=Array.from({length:Math.min(28,Math.round(innerWidth/50))},()=>mk(true));
-  function mk(init){return{x:Math.random()*innerWidth,y:init?Math.random()*innerHeight:-30,s:6+Math.random()*12,vy:.18+Math.random()*.35,sw:Math.random()*6.28,r:Math.random()*6.28,vr:(Math.random()-.5)*.012,c:Math.random()<.35?"blush":"sage",a:.18+Math.random()*.25}}
-  const blobs=[{c:"sage",r:.55,px:.15,py:.2,fx:.00013,fy:.00009},{c:"blush",r:.45,px:.85,py:.35,fx:.0001,fy:.00014},{c:"deep",r:.5,px:.5,py:.9,fx:.00008,fy:.00011}];
+  const COLS=W0()>700?64:36,ROWS=26;function W0(){return innerWidth}
+  const dust=Array.from({length:W0()>700?140:70},()=>({x:(Math.random()-.5)*2400,y:(Math.random()-.5)*1400,z:Math.random()*1600+100,s:Math.random()*1.6+.4,p:Math.random()*6.28}));
+  function proj(x,y,z,f){ // поворот камеры + перспектива
+    const ry=cx*.35,rx=.28+cy*.18;
+    let X=x*Math.cos(ry)-z*Math.sin(ry),Z=x*Math.sin(ry)+z*Math.cos(ry);
+    let Y=y*Math.cos(rx)-Z*Math.sin(rx);Z=y*Math.sin(rx)+Z*Math.cos(rx)+900;
+    if(Z<40)return null;const k=f/Z;return [W/2+X*k,H*.42+Y*k,Z];
+  }
   function frame(){
     ctx.clearRect(0,0,W,H);
-    const ba=.07;
-    blobs.forEach((b,i)=>{const x=W*(b.px+Math.sin(t*b.fx*1000+i)*.12),y=H*(b.py+Math.cos(t*b.fy*1000+i*2)*.12),R=Math.max(W,H)*b.r;
-      const g=ctx.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,hexA(C[b.c],ba));g.addColorStop(1,hexA(C[b.c],0));ctx.fillStyle=g;ctx.fillRect(0,0,W,H)});
-    tx+=(mx-tx)*.08;ty+=(my-ty)*.08;
-    if(tx>-500){const g=ctx.createRadialGradient(tx,ty,0,tx,ty,260);g.addColorStop(0,hexA(C.blush,C.dark?.13:.12));g.addColorStop(1,hexA(C.blush,0));ctx.fillStyle=g;ctx.fillRect(tx-260,ty-260,520,520)}
-    leaves.forEach((l,i)=>{l.y+=l.vy;l.sw+=.01;l.r+=l.vr;const x=l.x+Math.sin(l.sw)*22;
-      const dx=x-tx,dy=l.y-ty,d=Math.hypot(dx,dy);if(d<120){l.x+=dx/d*1.2;l.y+=dy/d*.6}
-      ctx.save();ctx.translate(x,l.y);ctx.rotate(l.r);ctx.fillStyle=hexA(C[l.c],l.a*(C.dark?.8:1));
-      ctx.beginPath();ctx.ellipse(0,0,l.s*.38,l.s,0,0,6.283);ctx.fill();
-      ctx.strokeStyle=hexA(C.dark?"#000000":"#ffffff",.25);ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(0,-l.s);ctx.lineTo(0,l.s);ctx.stroke();ctx.restore();
-      if(l.y>H+30)leaves[i]=mk(false)});
+    cx+=(mx-cx)*.05;cy+=(my-cy)*.05;
+    const f=Math.min(W,H)*1.1;
+    // золотая поверхность
+    for(let r=0;r<ROWS;r++){
+      const z=-500+r*70;ctx.beginPath();let first=true,za=0;
+      for(let c=0;c<=COLS;c++){
+        const x=-1500+c*(3000/COLS);
+        const y=520+Math.sin(x*.004+t*.6+r*.35)*55+Math.cos(z*.006+t*.45)*45+Math.sin((x+z)*.002-t*.3)*30-sy*.08;
+        const P=proj(x,y,z,f);if(!P){first=true;continue}
+        za=P[2];if(first){ctx.moveTo(P[0],P[1]);first=false}else ctx.lineTo(P[0],P[1]);
+      }
+      const a=Math.max(0,Math.min(.5,1-za/2600))*.55;
+      ctx.strokeStyle=`rgba(214,180,110,${a.toFixed(3)})`;ctx.lineWidth=Math.max(.5,1.4-za/2200);ctx.stroke();
+    }
+    // золотая пыль
+    dust.forEach(d=>{d.y-=.25;d.p+=.02;if(d.y<-750)d.y=750;
+      const P=proj(d.x+Math.sin(d.p)*20,d.y,d.z-800,f);if(!P)return;
+      const a=Math.max(0,1-P[2]/2600)*(.45+.35*Math.sin(d.p*2));const r=d.s*f/P[2]*1.4;
+      const g=ctx.createRadialGradient(P[0],P[1],0,P[0],P[1],r*4);g.addColorStop(0,`rgba(240,214,150,${a})`);g.addColorStop(1,"rgba(240,214,150,0)");
+      ctx.fillStyle=g;ctx.fillRect(P[0]-r*4,P[1]-r*4,r*8,r*8)});
   }
-  let last=0;function loop(ts){t=ts/1000;if(ts-last>1000){readColors();last=ts}frame();if(!document.hidden)raf=requestAnimationFrame(loop)}
-  let raf;readColors();size();addEventListener("resize",size);
-  addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY},{passive:true});
-  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!still)raf=requestAnimationFrame(loop)});
-  if(still)frame();else raf=requestAnimationFrame(loop);
+  function loop(ts){t=ts/1000;frame();if(!document.hidden)requestAnimationFrame(loop)}
+  size();addEventListener("resize",size);
+  addEventListener("pointermove",e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;
+    document.documentElement.style.setProperty("--px",mx.toFixed(3));document.documentElement.style.setProperty("--py",my.toFixed(3));},{passive:true});
+  addEventListener("scroll",()=>{sy=scrollY},{passive:true});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!still)requestAnimationFrame(loop)});
+  if(still)frame();else requestAnimationFrame(loop);
+})();
+
+/* ---------- сияние за курсором + золотая пыль-шлейф ---------- */
+(function(){
+  if(!matchMedia("(hover:hover)").matches||matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  const glow=$("#cursorGlow");let gx=-500,gy=-500,tx=-500,ty=-500,last=0;
+  addEventListener("pointermove",e=>{tx=e.clientX;ty=e.clientY;glow.style.opacity=1;
+    const now=performance.now();if(now-last>40){last=now;const s=document.createElement("span");s.className="trail";s.style.left=tx+"px";s.style.top=ty+"px";
+      s.style.setProperty("--dx",(Math.random()*40-20)+"px");s.style.setProperty("--dy",(Math.random()*30+10)+"px");document.body.appendChild(s);setTimeout(()=>s.remove(),900)}
+    const card=e.target.closest(".dir,.show figure,.bcard,.pcard,.msg a,.btn,.choose button,.tcard,.gallery figure,.unified,.band .about div");
+    if(card){const r=card.getBoundingClientRect();card.style.setProperty("--mx",(e.clientX-r.left)+"px");card.style.setProperty("--my",(e.clientY-r.top)+"px")}
+  },{passive:true});
+  document.addEventListener("pointerleave",()=>glow.style.opacity=0);
+  (function step(){gx+=(tx-gx)*.18;gy+=(ty-gy)*.18;glow.style.transform=`translate(${gx}px,${gy}px)`;requestAnimationFrame(step)})();
 })();
 
 /* ---------- 3D-наклон карточек за курсором ---------- */
