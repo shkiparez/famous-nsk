@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#072218">
 <title>Famous салон красоты</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Famous — салон красоты в Новосибирске. Три филиала: Семьи Шамшиных, 26 · Фрунзе, 228 · Карла Маркса, 51.">
@@ -516,8 +522,33 @@ body{background:transparent!important}
 .dir:hover::before,.show figure:hover::before,.bcard:hover::before,.pcard:hover::before,.msg a:hover::before,.choose button:hover::before,.gallery figure:hover::before,.unified:hover::before,.band .about div:hover::before{opacity:1}
 .show figure:first-child::before{border-radius:999px 999px 4px 4px}
 @media (hover:none){#cursorGlow{display:none}}
+
+/* ---------- телефон ---------- */
+@media (max-width:600px){
+  h2{font-size:1.75rem}
+  .hero h1{font-size:2.5rem}
+  .dir h3{font-size:.86rem;letter-spacing:.04em;overflow-wrap:anywhere}
+  .dir .cap{padding:12px 8px 14px}
+  .sheet{padding:22px 14px;outline-offset:4px}
+  .sheet .logo{font-size:1.35rem}
+  .sheet .q{font-size:1.1rem;margin:14px 0 18px}
+  .choose{gap:10px}
+  .choose button{grid-template-columns:96px 1fr;padding:6px}
+  .choose .ctxt{padding:8px 10px}
+  .choose .ctxt b{font-size:1.08rem}
+  .choose .ctxt span{font-size:.72rem;line-height:1.4}
+  .choose .ctxt i{font-size:.72rem}
+  .choose .mlogo{width:34px;height:34px;font-size:5px;left:5px;top:5px}
+  .choose .map{min-height:96px}
+  .show figcaption{font-size:.62rem;padding:4px 8px;left:10px;bottom:10px}
+  .pcard{outline-offset:3px}
+  .pcard li{font-size:.86rem}
+  .dock button,.dock a{padding:10px 12px}
+}
 </style>
 
+</head>
+<body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="leaf" viewBox="0 0 400 400"><g fill="currentColor">
@@ -1054,3 +1085,6 @@ route();
 openChooser();
 })();
 </script>
+
+</body>
+</html>
